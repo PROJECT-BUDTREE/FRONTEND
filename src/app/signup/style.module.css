@@ -106,22 +106,24 @@
 
 .footer {
   width: 100%;
-  padding: 20px;
+  padding: 30px;
   margin-top: auto; /* Changed to auto to push to bottom */
 }
 
 .btn {
   border-radius: 30px;
   border: 1px solid #b9b6ad;
-  height: 50px;
+  height: 55px;
   width: 100%;
   background-color: rgba(255, 255, 255, 0.5);
+  padding: 15px;
   color: #575757;
   font-size: 16px;
   cursor: pointer;
+  margin-bottom: 20px;
 }
 
 .btn:hover {
-  background-color: #b9b6ad;
+  background-color: #d9cebb;
   color: white;
 }

@@ -57,3 +57,22 @@
   color: #575757;
   border: 1px solid #b9b6ad;
 }
+
+/* 완료 버튼 명확히 설정하기 */
+.completeButton {
+  width: 90%;
+  padding: 15px;
+  margin: 20px;
+  margin-bottom: 100px; /* 화면 하단과의 간격 확보 */
+  background-color: #f3efe9;
+  border: 1px solid #b9b6ad;
+  color: black;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+}
+
+.completeButton:hover {
+  background-color: #ede7de;
+}

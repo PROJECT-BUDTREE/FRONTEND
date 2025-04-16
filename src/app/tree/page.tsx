@@ -130,27 +130,6 @@ export default function Page() {
           </p>
         </div>
       </div>
-      {/* {selectedDiary && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <div className={styles.modalHeader}>
-              <span className={styles.modalDate}>{selectedDiary.date}</span>
-              <button
-                className={styles.closeButton}
-                onClick={() => setSelectedDiary(null)}
-              >
-                ✕
-              </button>
-            </div>
-            <img
-              src={`/${selectedDiary.emotion}.png`}
-              alt="emotion"
-              className={styles.modalEmoji}
-            />
-            <p className={styles.modalText}>{selectedDiary.content}</p>
-          </div>
-        </div>
-      )} */}
       {selectedDiary && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>

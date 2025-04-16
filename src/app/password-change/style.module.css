@@ -96,18 +96,20 @@
 }
 
 .btn {
-  border-radius: 30px;
+  width: 90%;
+  padding: 18px;
+  margin: 20px;
+  margin-bottom: 50px;
+  background-color: #f3efe9;
   border: 1px solid #b9b6ad;
-  height: 60px;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.5);
-  color: #000;
-  font-size: 16px;
+  color: black;
+  border-radius: 30px;
   cursor: pointer;
-  color: #575757;
-  padding-bottom: 5px;
+  font-size: 16px;
+  text-align: center;
 }
 
 .btn:hover {
-  background-color: #b9b6ad;
+  background-color: #d9cebb;
+  color: white;
 }

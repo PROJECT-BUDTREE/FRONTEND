@@ -5,6 +5,13 @@ import styles from "./style.module.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+// 1. 아이디를 입력하면 중복확인
+// 2. 아이디,닉네임 비밀번호, 비밀번호 확인에서 하나라도 빠질시 인풋창 밑에 경고문 출력해주기
+// 3. 비밀번호와 비밀번호 확인 동일한지 check
+// 4. 비밀번호 조건문 채우기
+// 5. 비밀번호 (8자 이상, 문자/숫자/기호 사용)
+// 6. 반응형 check
+
 export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,7 +31,7 @@ export default function Signup() {
 
   return (
     <div className={styles.container}>
-      <Header title="회원가입" />
+      <Header title="회원가입" showBack />
       <div className={styles.inputArea}>
         <div className={styles.inputId}>
           <div className={styles.newId}>아이디</div>

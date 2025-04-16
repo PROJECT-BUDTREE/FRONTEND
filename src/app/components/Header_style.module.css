@@ -58,6 +58,7 @@
   font-weight: bold;
   cursor: pointer;
 }
+
 .deleteBtn {
   position: absolute;
   right: 16px;
