@@ -90,8 +90,8 @@ export default function NickChange() {
   }, []);
 
   const nicknameComplete = async () => {
-    console.log("보내는 닉네임:", nickname);
-    console.log("ACCESS_TOKEN:", localStorage.getItem("token"));
+    // console.log("보내는 닉네임:", nickname);
+    // console.log("ACCESS_TOKEN:", localStorage.getItem("token"));
     if (!validateNickname()) return;
 
     try {
