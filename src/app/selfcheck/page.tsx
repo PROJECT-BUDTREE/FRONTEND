@@ -29,6 +29,7 @@ export default function Page() {
   const [current, setCurrent] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  
 
   const handleSelect = (value: number) => {
     const updated = [...answers];
@@ -52,6 +53,13 @@ export default function Page() {
 
     try {
       const response = await apiRequest.post("/survey/save", requestBody);
+
+      const data = response.data as {
+        status: number
+        message: { surveyId: number };
+      };
+
+      const surveyId = data.message.surveyId;
       
       // 결과 저장
       const tempResults = questions.map((question, index) => ({ question, score: answers[index] }));
@@ -62,9 +70,8 @@ export default function Page() {
       const totalScore = Object.values(resultsByOneIndex).reduce((sum, r) => sum + r.score, 0);
       
       sessionStorage.setItem("selfcheckResults", JSON.stringify(resultsByOneIndex));
-      sessionStorage.setItem("selfcheckTotalScore", totalScore.toString());
 
-      router.push(`/selfcheck/result?score=${totalScore}`);
+      router.push(`/selfcheck/result?score=${totalScore}&surveyId=${surveyId}`);
     } catch (error) {
       console.error("자가진단 제출 중 오류 발생:", error);
     } finally {
