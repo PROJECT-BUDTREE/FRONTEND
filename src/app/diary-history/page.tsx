@@ -266,7 +266,7 @@ export default function DiaryHistory() {
     GOOD: "좋음",
     SOSO: "보통",
     BAD: "나쁨",
-    TERRIBLE: "끔찍함",
+    TERRIBLE: "완전 나쁨",
   };
 
   const emotionImageMap: Record<DiaryItem["emotion"], string> = {
@@ -321,6 +321,7 @@ export default function DiaryHistory() {
 
   return (
     <div className={styles["diary-container"]} ref={dropdownRef}>
+
       <Header
         title="일기 내역"
         showBack
