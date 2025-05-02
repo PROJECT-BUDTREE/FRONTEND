@@ -21,7 +21,7 @@ export default function MyPage() {
   const [userId, setUserId] = useState("");
 
   useEffect(() => {
-    const savedNickname = localStorage.getItem("nickname");
+    const savedNickname = localStorage.getItem("userName");
     const savedUserId = localStorage.getItem("id");
 
     // 닉네임 저장

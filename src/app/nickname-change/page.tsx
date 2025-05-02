@@ -61,7 +61,6 @@ import Header from "../components/Header";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import apiRequest from "../util/reissue";
-import axios from "axios";
 
 export default function NickChange() {
   const router = useRouter();
@@ -83,7 +82,7 @@ export default function NickChange() {
     //   localStorage.getItem("ACCESS_TOKEN")
     // );
 
-    const savedNickname = localStorage.getItem("userName");
+    const savedNickname = localStorage.getItem("nickname");
     if (savedNickname) {
       setNickname(savedNickname);
     }
@@ -128,7 +127,7 @@ export default function NickChange() {
           <input
             className={styles.nickSetting}
             placeholder="닉네임을 입력하세요."
-            value={nickname}
+            // value={nickname}
             onChange={(e) => {
               setNickname(e.target.value);
               if (e.target.value.trim() !== "") {
