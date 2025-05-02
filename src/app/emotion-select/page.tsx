@@ -135,7 +135,7 @@ export default function EmotionSelectPage() {
     if (!selectedEmotion || !content) return;
 
     try {
-      const response = await apiRequest.post(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/post/create`, {
+      const response = await apiRequest.post("/post/create", {
         content,
         emotion: selectedEmotion,
       });

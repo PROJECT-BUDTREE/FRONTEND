@@ -98,6 +98,7 @@ export default function NickChange() {
         name: nickname,
       });
 
+
       const data = response.data as {
         status: number;
         message: string;
