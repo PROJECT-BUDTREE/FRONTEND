@@ -1,4 +1,4 @@
-"use client"; // Next.js 13+ 클라이언트 컴포넌트에서 필요
+"use client"; 
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -9,13 +9,7 @@ export default function DiaryPage() {
   const [text, setText] = useState("");
   const router = useRouter();
 
-  // 텍스트가 공백이 아닌 경우만 버튼 활성화
   const isDisabled = text.trim().length === 0;
-
-  // function handleSubmit() {
-  //   // 이동할 페이지(감정 선택 페이지) 경로 지정
-  //   router.push("/emotion-select");
-  // }
 
   function handleSubmit() {
     const encoded = encodeURIComponent(text.trim());

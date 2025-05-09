@@ -4,82 +4,44 @@ import { useSearchParams } from "next/navigation";
 import Header from "../components/Header";
 import styles from "./tree.module.css"; // CSS 모듈 추가
 import { useState, useEffect } from "react";
+import apiRequest from "../util/reissue";
 
 export default function Page() {
-  const dummyDiaries = [
-    {
-      postId: "1",
-      emotion: "1",
-      date: "3월 31일 월요일",
-      content:
-        "오늘 바람이 너무 강해 내가 먹고 있던 아이스크림이 떨어졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다. 친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.친구가 다시 사줘서 기분이 좋아졌다.",
-    },
-    {
-      postId: "2",
-      emotion: "2",
-      date: "4월 2일 화요일",
-      content: "오늘은 날씨가 흐렸지만 기분은 괜찮았다.",
-    },
-    {
-      postId: "3",
-      emotion: "3",
-      date: "4월 3일 화요일",
-      content: "오늘은 날씨가 좋았지만 기분은 걍 그럼.",
-    },
-    {
-      postId: "4",
-      emotion: "4",
-      date: "4월 4일 화요일",
-      content: "오늘은 날씨가 흐리고 기분도 흐림.",
-    },
-    {
-      postId: "5",
-      emotion: "5",
-      date: "4월 5일 화요일",
-      content: "오늘은 날씨가 흐렸고 기분은 안좋음.",
-    },
-    {
-      postId: "6",
-      emotion: "1",
-      date: "4월 6일 화요일",
-      content: "오늘은 날씨도 좋고 기분도 좋음.",
-    },
-  ];
+  const emotionMap: Record<string, string> = {
+    EXCELLENT: "1",
+    GOOD: "2",
+    SOSO: "3",
+    BAD: "4",
+    TERRIBLE: "5",
+  };
 
   // const [diaries, setDiaries] = useState([]);
-  const [diaries, setDiaries] = useState(dummyDiaries); // Using dummy data for style testing
+  const [diaries, setDiaries] = useState([]);
   const searchParams = useSearchParams();
   const selectedEmoji = searchParams.get("emoji");
 
-  // 예시: 클라이언트 컴포넌트에서 fetch API
   useEffect(() => {
-    async function fetchLatestDiaries() {
+    async function fetchEmotions() {
       try {
-        const res = await fetch("https://api.budtree.store/post/all");
-        const data = await res.json(); // [ { postId, content, emotion, ... }, ... ]
-
-        // 최신순 정렬 (백엔드가 이미 정렬해준다 해도 혹시 몰라서)
-        // const sorted = data.sort(
-        //   (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        // );
-
-        // 최대 6개만 잘라서 상태에 저장
-        // setDiaries(sorted.slice(0, 6));
+        const res = await apiRequest.get("/post/find-emotion");
+        console.log("감정 API 응답:", res.data);
+        const data = (
+          res.data as { message: { postId: number; emotion: string }[] }
+        ).message;
+        setDiaries(data);
       } catch (error) {
-        console.error("일기 목록 가져오기 실패:", error);
+        console.error("감정 이모지 불러오기 실패:", error);
       }
     }
 
-    fetchLatestDiaries();
+    fetchEmotions();
   }, []);
 
   const [selectedDiary, setSelectedDiary] = useState<null | {
-    date: string;
+    createdDate: string;
     content: string;
     emotion: string;
   }>(null);
-
-  const dummyEmojis = ["1", "2", "3", "4", "5", "6"];
 
   return (
     <div className={styles.container}>
@@ -97,19 +59,39 @@ export default function Page() {
           }}
         />
       ))} */}
-      {diaries.map((diary, index) => {
-        const emotionId = diary.emotion; // 예: '1', '2', ...
-        const positionClass = `emotionIcon${index + 1}`;
-        return (
-          <img
-            key={diary.postId}
-            src={`/${emotionId}.png`}
-            alt={`emotion-${emotionId}`}
-            className={`${styles.emotionIcon} ${styles[`emotion${index + 1}`]}`}
-            onClick={() => setSelectedDiary(diary)}
-          />
-        );
-      })}
+      {Array.isArray(diaries) &&
+        diaries.map((diary, index) => {
+          const emotionId = emotionMap[diary.emotion] ?? "1";
+          return (
+            <img
+              key={diary.postId}
+              src={`/${emotionId}.png`}
+              alt={`emotion-${emotionId}`}
+              className={`${styles.emotionIcon} ${
+                styles[`emotion${index + 1}`]
+              }`}
+              onClick={async () => {
+                try {
+                  const res = await apiRequest.get(
+                    `/post/find-post/${diary.postId}`
+                  );
+                  const data = (
+                    res.data as {
+                      message: {
+                        createdDate: string;
+                        content: string;
+                        emotion: string;
+                      };
+                    }
+                  ).message;
+                  setSelectedDiary(data);
+                } catch (e) {
+                  console.error("일기 조회 실패", e);
+                }
+              }}
+            />
+          );
+        })}
 
       <div className={styles.buddyContainer}>
         <div className={styles.buddyImageWrapper}>
@@ -135,7 +117,21 @@ export default function Page() {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <span>{selectedDiary.date}</span>
+              {(() => {
+                console.log("선택된 일기:", selectedDiary);
+                return null;
+              })()}
+              <span>
+                {new Date(selectedDiary.createdDate).toLocaleDateString(
+                  "ko-KR",
+                  {
+                    // year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long",
+                  }
+                )}
+              </span>
               <button
                 className={styles.closeButton}
                 onClick={() => setSelectedDiary(null)}
@@ -144,7 +140,7 @@ export default function Page() {
               </button>
             </div>
             <img
-              src={`/${selectedDiary.emotion}.png`}
+              src={`/${emotionMap[selectedDiary.emotion] ?? "1"}.png`}
               alt={`emotion-${selectedDiary.emotion}`}
               className={styles.modalEmoji}
             />

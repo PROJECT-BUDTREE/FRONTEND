@@ -5,7 +5,6 @@ import Image from "next/image";
 import Header from "../components/Header";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import apiRequest from "../util/reissue";
 
 export default function LoginPage() {
   const [id, setId] = useState("");
@@ -61,7 +60,8 @@ export default function LoginPage() {
         { username: id, password: password },
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true,
+
+          withCredentials: true
         }
       );
 
@@ -110,7 +110,6 @@ export default function LoginPage() {
             height={202}
           />
         </div>
-        {/* 아이디 입력 */}
         <input
           type="text"
           placeholder="아이디를 입력해주세요."
@@ -129,7 +128,6 @@ export default function LoginPage() {
         {idError && <p className={styles.error}>{idError}</p>}
         <br />
 
-        {/* 비밀번호 입력 */}
         <div className={styles.inputWrapper}>
           <input
             type={passwordType1.type}

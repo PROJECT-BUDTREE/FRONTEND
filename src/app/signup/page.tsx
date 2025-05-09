@@ -1,77 +1,73 @@
-"use client";
+"use client"
 
 import Header from "../components/Header";
 import styles from "./style.module.css";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import apiRequest from "../util/reissue";
+import axios from "axios";
 
 export default function Signup() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [id, setId] = useState("");
   const [nickname, setNickname] = useState("");
   const [lastCheckedId, setLastCheckedId] = useState("");
-
-  const router = useRouter();
-  const serverURL = process.env.NEXT_PUBLIC_API_SERVER_URL;
-
-  // 에러 문구 출력 useState()
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [idError, setIdError] = useState("");
   const [nicknameError, setNicknameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [idChecked, setIdChecked] = useState(false);
+  
+  const router = useRouter();
+  const serverURL = process.env.NEXT_PUBLIC_API_SERVER_URL;
 
-  const handleDuplicateCheck = async () => {
-    handleId(); // 강제로 blur 처리
+  const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setId(e.target.value);
+    setIdChecked(false);
+    setIdError("");
+  };
 
-    // 아이디가 비어있는지 확인
+  const handleId = () => {
     if (id.trim() === "") {
       setIdError("아이디를 입력해주세요.");
-      return;
+    } else if (!idChecked) {
+      setIdError("아이디 중복확인을 해주세요.");
+    } else {
+      setIdError("");
     }
+  };
 
-    // 중복확인
+  const handleDuplicateCheck = async () => {
+    handleId();
+    if (id.trim() === "") return;
     try {
-      const response = await apiRequest.post(
-        "member/check",
+      const response = await axios.post(
+        `${serverURL}/member/check`,
         { username: id },
-        {
-          headers: {
-            Authorization: null, // ✅ 토큰 헤더 제거
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { "Content-Type": "application/json" } }
       );
 
       const data = response.data as any;
-
-      // 서버 응답 구조 확인
-      if (data && data.message && data.message.success === 1) {
+      if (data.message.success === 1) {
         setIdError("사용 가능한 아이디입니다.");
-        //localStorage.setItem("id", id);
         setIdChecked(true);
         setLastCheckedId(id); // ✅ 중복확인된 id 기억
       } else {
         setIdError("이미 사용 중인 아이디입니다.");
         setIdChecked(false);
       }
-    } catch (err) {
-      if (err.response) {
-        console.log("에러 상세:", err.response.data);
-        setIdError(err.response.data.message || "중복확인을 할 수 없습니다.");
-      } else {
-        alert("네트워크 오류 또는 서버 응답 없음.");
-      }
+    } catch (err: any) {
+      setIdError(
+        err.response?.data?.message ||
+          "중복확인을 할 수 없습니다. 네트워크를 확인해주세요."
+      );
       setIdChecked(false);
     }
   };
 
-  const buttonClick = async () => {
-    //localStorage.setItem("userName", nickname);
 
+  const buttonClick = async () => {
     if (id !== lastCheckedId) {
       alert("아이디를 수정하셨습니다. 다시 중복확인을 해주세요.");
       return;
@@ -124,7 +120,7 @@ export default function Signup() {
 
   const handleConfirmPassword = () => {
     if (confirmPassword.trim() === "") {
-      setConfirmPasswordError("변경할 비밀번호를 입력해주세요.");
+      setConfirmPasswordError("비밀번호를 다시 입력해주세요.");
     } else if (password !== confirmPassword) {
       setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
     } else {
@@ -132,21 +128,14 @@ export default function Signup() {
     }
   };
 
-  const [passwordType1, setPasswordType1] = useState({
-    type: "password",
-    visible: false,
-  });
-  const [passwordType2, setPasswordType2] = useState({
-    type: "password",
-    visible: false,
-  });
+  const [passwordType1, setPasswordType1] = useState({ type: "password", visible: false });
+  const [passwordType2, setPasswordType2] = useState({ type: "password", visible: false });
   const handlePasswordType1 = () => {
     setPasswordType1((prev) => ({
       type: prev.visible ? "password" : "text",
       visible: !prev.visible,
     }));
   };
-
   const handlePasswordType2 = () => {
     setPasswordType2((prev) => ({
       type: prev.visible ? "password" : "text",
@@ -166,16 +155,10 @@ export default function Signup() {
               placeholder="아이디를 입력해주세요."
               className={styles.inputid__}
               value={id}
-              onChange={(e) => {
-                setId(e.target.value);
-                setIdChecked(false);
-              }}
+              onChange={handleIdChange}
               onBlur={handleId}
             />
-            <button
-              className={styles.duplicateCheckBtn}
-              onClick={handleDuplicateCheck}
-            >
+            <button className={styles.duplicateCheckBtn} onClick={handleDuplicateCheck}>
               중복확인
             </button>
           </div>
@@ -238,17 +221,39 @@ export default function Signup() {
               )}
             </div>
           </div>
-          {confirmPasswordError && (
-            <p className={styles.error}>{confirmPasswordError}</p>
-          )}
+          {confirmPasswordError && <p className={styles.error}>{confirmPasswordError}</p>}
         </div>
       </div>
 
       <div className={styles.footer}>
         <button
           className={styles.btn}
-          onClick={buttonClick}
+          onClick={async () => {
+            if (!idChecked) {
+              alert("아이디 중복확인을 해주세요.");
+              return;
+            }
+            try {
+              await axios.post(
+                `${serverURL}/member/register`,
+                {
+                  username: id,
+                  name: nickname,
+                  password : password,
+                  verifyPassword: confirmPassword,
+                  success: idChecked ? 1 : 0
+                },
+                { headers: { "Content-Type": "application/json" } }
+              );
+              alert("회원가입이 완료되었습니다!");
+              router.push("./LoginPage");
+            } catch (err: any) {
+              const msg = err.response?.data?.message || "회원가입에 실패했습니다. 다시 시도해주세요.";
+              alert(msg);
+            }
+          }}
           disabled={
+            !idChecked ||
             id.trim() === "" ||
             nickname.trim() === "" ||
             password.trim() === "" ||

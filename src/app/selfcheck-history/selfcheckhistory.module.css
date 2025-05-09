@@ -10,7 +10,6 @@
   overflow: auto;
 }
 
-/* Header */
 .selfcheckhistory-header {
   width: 100%;
   max-width: 400px;
@@ -29,7 +28,6 @@
   width: 20px;
 }
 
-/* Selectors */
 .selector-container {
   display: flex;
   gap: 12px;

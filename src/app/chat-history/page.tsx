@@ -5,7 +5,17 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import styles from "./chathistory.module.css";
+import apiRequest from "../util/reissue";
 
+interface ChatRoom {
+  roomId: number;
+  createdTime: string;
+}
+
+interface ChatRoomResponse {
+  status: number;
+  message: ChatRoom[];
+}
 export default function ChatHistory() {
   const router = useRouter();
 
@@ -14,17 +24,17 @@ export default function ChatHistory() {
   const [selectedYear, setSelectedYear] = useState("연도");
   const [selectedMonth, setSelectedMonth] = useState("월");
 
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 2020 + 1 }, (_, index) =>
-    (2020 + index).toString()
+    (currentYear - index).toString()
   );
-  const months = [
-    "1월", "2월", "3월", "4월", "5월", "6월", "7월",
-    "8월", "9월", "10월", "11월", "12월",
-  ];
+  const months = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const resultListRef = useRef<HTMLDivElement>(null);
@@ -63,42 +73,68 @@ export default function ChatHistory() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const mockResults = Array.from({ length: 10 }, (_, i) => ({
-    date: `2025/03/${20 + i}`,
-  }));
+  useEffect(() => {
+    const fetchChatRooms = async () => {
+      const year = selectedYear === "연도" ? 0 : parseInt(selectedYear);
+      const month = selectedMonth === "월" ? 0 : parseInt(selectedMonth);
+  
+      try {
+        const response = await apiRequest.post<ChatRoomResponse>("/chatroom/all", {
+          year,
+          month,
+        });
+  
+        if (response.status === 200 && Array.isArray(response.data.message)) {
+          setChatRooms(response.data.message);
+          setError(null);
+        } else {
+          setChatRooms([]);
+        }
+      } catch (err: any) {
+        const message = err?.response?.data?.message;
+        setChatRooms([]);
+        setError(message || "오류가 발생했습니다.");
+        console.error("조회 실패:", err);
+      }
+    };
+  
+    fetchChatRooms();
+  }, [selectedYear, selectedMonth]);
+  
+
+  const getTitle = () => {
+    const year = selectedYear === "연도" ? null : selectedYear;
+    const month = selectedMonth === "월" ? null : selectedMonth.replace("월", "");
+    if (year && month) return `${year}년 ${month}월`;
+    if (year) return `${year}년`;
+    if (month) return `${month}월`;
+    return "전체 내역";
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toISOString().split("T")[0].replace(/-/g, "/");
+  };
 
   return (
     <div className={styles["chathistory-container"]} ref={dropdownRef}>
-      <Header
-        title="대화 내역"
-        showBack
-        onBack={() => router.push("/mypage")}
-      />
+      <Header title="대화 내역" showBack onBack={() => router.push("/mypage")} />
 
       <div className={styles["selector-container"]}>
         <div className={styles["dropdown-wrapper"]}>
           <button
-            className={`${styles["selector-button"]} ${
-              showYearDropdown ? styles.active : ""
-            }`}
+            className={`${styles["selector-button"]} ${showYearDropdown ? styles.active : ""}`}
             onClick={() => {
               setShowYearDropdown(!showYearDropdown);
               setShowMonthDropdown(false);
             }}
           >
             {selectedYear}
-            {showYearDropdown ? (
-              <ChevronUp className={styles["selector-icon"]} />
-            ) : (
-              <ChevronDown className={styles["selector-icon"]} />
-            )}
+            {showYearDropdown ? <ChevronUp className={styles["selector-icon"]} /> : <ChevronDown className={styles["selector-icon"]} />}
           </button>
           {showYearDropdown && (
             <div className={styles.dropdown}>
               <div
-                className={`${styles["dropdown-item"]} ${
-                  selectedYear === "연도" ? styles.selected : ""
-                }`}
+                className={`${styles["dropdown-item"]} ${selectedYear === "연도" ? styles.selected : ""}`}
                 onClick={() => handleYearSelect("연도")}
               >
                 선택안함
@@ -106,9 +142,7 @@ export default function ChatHistory() {
               {years.map((year) => (
                 <div
                   key={year}
-                  className={`${styles["dropdown-item"]} ${
-                    selectedYear === year ? styles.selected : ""
-                  }`}
+                  className={`${styles["dropdown-item"]} ${selectedYear === year ? styles.selected : ""}`}
                   onClick={() => handleYearSelect(year)}
                 >
                   {year}
@@ -120,27 +154,19 @@ export default function ChatHistory() {
 
         <div className={styles["dropdown-wrapper"]}>
           <button
-            className={`${styles["selector-button"]} ${
-              showMonthDropdown ? styles.active : ""
-            }`}
+            className={`${styles["selector-button"]} ${showMonthDropdown ? styles.active : ""}`}
             onClick={() => {
               setShowMonthDropdown(!showMonthDropdown);
               setShowYearDropdown(false);
             }}
           >
             {selectedMonth}
-            {showMonthDropdown ? (
-              <ChevronUp className={styles["selector-icon"]} />
-            ) : (
-              <ChevronDown className={styles["selector-icon"]} />
-            )}
+            {showMonthDropdown ? <ChevronUp className={styles["selector-icon"]} /> : <ChevronDown className={styles["selector-icon"]} />}
           </button>
           {showMonthDropdown && (
             <div className={styles.dropdown}>
               <div
-                className={`${styles["dropdown-item"]} ${
-                  selectedMonth === "월" ? styles.selected : ""
-                }`}
+                className={`${styles["dropdown-item"]} ${selectedMonth === "월" ? styles.selected : ""}`}
                 onClick={() => handleMonthSelect("월")}
               >
                 선택안함
@@ -148,9 +174,7 @@ export default function ChatHistory() {
               {months.map((month) => (
                 <div
                   key={month}
-                  className={`${styles["dropdown-item"]} ${
-                    selectedMonth === month ? styles.selected : ""
-                  }`}
+                  className={`${styles["dropdown-item"]} ${selectedMonth === month ? styles.selected : ""}`}
                   onClick={() => handleMonthSelect(month)}
                 >
                   {month}
@@ -162,25 +186,28 @@ export default function ChatHistory() {
       </div>
 
       <div className={styles["chathistory-list-container"]} ref={resultListRef}>
-        <h2 className={styles["chathistory-list-title"]}>2025년 3월</h2>
-        {mockResults.map((item, idx) => (
+        <h2 className={styles["chathistory-list-title"]}>{getTitle()}</h2>
+
+        {error && (
+          <div className={styles["error-container"]}>
+            <p className={styles["error-message"]}>{error}</p>
+          </div>
+        )}
+
+        {chatRooms.map((item) => (
           <div
-            key={idx}
+            key={item.roomId}
             className={styles["chathistory-item"]}
-            onClick={() =>
-              router.push(`/chat/${item.date.replaceAll("/", "-")}`)
-            }
+            onClick={() => router.push(`/chat/${item.roomId}`)}
             style={{ cursor: "pointer" }}
           >
-            <p className={styles["chathistory-item-date"]}>{item.date}</p>
+            <p className={styles["chathistory-item-date"]}>{formatDate(item.createdTime)}</p>
           </div>
         ))}
 
         {isScrolled && (
           <button
-            className={`${styles["scroll-to-top-button"]} ${
-              isAtBottom ? styles["at-bottom"] : ""
-            }`}
+            className={`${styles["scroll-to-top-button"]} ${isAtBottom ? styles["at-bottom"] : ""}`}
             onClick={scrollToTop}
           >
             <ChevronUp className={styles["scroll-top-icon"]} />

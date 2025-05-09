@@ -211,7 +211,6 @@
   font-weight: bold;
 }
 
-/* Scrollbar */
 .dropdown::-webkit-scrollbar {
   width: 4px;
 }
@@ -225,7 +224,6 @@
   background-color: transparent;
 }
 
-/* Wrapper */
 .dropdown-wrapper {
   position: relative;
   margin-right: 8px;
